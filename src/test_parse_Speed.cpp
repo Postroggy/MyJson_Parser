@@ -52,17 +52,18 @@ void test_simdJson(std::ifstream &fin) {
     std::cout << "read file error";
     return;
   }
-  string json_str((istreambuf_iterator<char>(fin)), istreambuf_iterator<char>());
-  simdjson::dom::parser parser;
+  using namespace simdjson;
+  ondemand::parser parser;
+  padded_string json = padded_string::load(R"(../test_json/large-file.json)") ;
   {
     Timer t;
-    simdjson::dom::element j = parser.parse(json_str);
+    ondemand::document  j = parser.iterate(json);
     cout<<"simdjson : ";
   }
 }
 int main(int argc, char *argv[]) {
   /*读取文件*/
-  std::ifstream ifs(R"(../test_json/vscode_Nocomment.json)");
+  std::ifstream ifs(R"(../test_json/large-file.json)");
   test_MyJSON(ifs);
   test_rapidJSON(ifs);
   test_simdJson(ifs);

@@ -86,10 +86,21 @@ string m_str;
 size_t m_idx{}; /*当前解析的字符的位置 0 */
 ```
 # 6. TODO:与其他开源项目的性能对比
-测试用的json文件，是我从vscode里面取出来的[VScode配置文件](./test_json/vscode_Nocomment.json)。  
+测试用的json文件 1940行，是我从vscode里面取出来的[VScode配置文件](./test_json/vscode_Nocomment.json)。  
+1940行json文件测试数据：
 
 | 库        | 用时  |
 |----------|-----|
-| MyJSON   |     |
-| rapidJSON |     |
-| simdJSON |     | 
+| MyJSON   |   1236 us  |
+| rapidJSON |  9 us    |
+| simdJSON |   208 us  | 
+
+可能是因为文件不够大，在用一个大文件试试(27MB)
+
+| 库        | 用时  |
+|----------|-----|
+| MyJSON   |   563852 us  |
+| rapidJSON |  7 us    |
+| simdJSON |   23741 us  | 
+
+可能我电脑不支持SIMD吧，腾讯的rapidJSON怎么能这么快啊。
