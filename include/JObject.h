@@ -67,13 +67,13 @@ public:
   /* 这里的作用就是定义类型，为了代码简洁 */
   using value_t = variant<bool_t, int_t, double_t, str_t, list_t, dict_t>;
 
-  JObject() /*键值 ,类型默认为null类型*/
+  JObject() /*键值 ，默认构造类型默认为null类型*/
   {
     m_type = T_NULL;
     m_value = "null";
   }
 
-  /*TODO：隐式转化在C++里有个坑，只能为类提供一种方向的隐式转化，比如提供了int把转为
+  /* TODO：隐式转化在C++里有个坑，只能为类提供一种方向的隐式转化，比如提供了int把转为
    * JObject的隐式转化后，就不能再提供把JObject转为int的隐式转化了，这两种必须要有一个是explicit，否则报错*/
   /*但是这里我们不需要加 explicit,因为要的效果就是隐式转换*/
   /*****************************************
@@ -118,12 +118,15 @@ public:
    * end：构造函数重载
    *************************/
 
+/** @param #erron 是一个字符串化操作符，将erron转化为字符串
+ * @funtion 如果json的格式有错误，都是抛出这个异常*/
 #define THROW_GET_ERROR(erron)                                                 \
   throw std::logic_error("type error in get " #erron " value!")
   /**
    * 获取 JObject 内部的 任意类型数据（泛型）
-   * 内部有调用value()方法得到对应的数据指针，而Value方法则负责将指针强转，
-   * 其内部也实现了强大的错误处理，防止处理指针的意外宕机。
+   * 内部有调用 value()方法得到对应的数据指针，而
+   * Value()方法则负责将指针强转为对应类型，
+   * 其内部也错误处理，防止处理指针的意外宕机。
    * @tparam V
    * @return
    */
@@ -151,13 +154,14 @@ public:
     /*这里 value()返回的是对应类型数据的指针，再将他转为 void*
      * FIXME:这样做的目的：因为void*指针可以转任意类型的指针 */
     void *v = value();
-    if (v == nullptr)
+    if (v == nullptr) /*如果没获取到指针*/
       throw std::logic_error("unknown type in JObject::Value()");
-    return *((V *)v); /*FIXME: V是泛型，这里将 void* 转为
-                V类型的指针，再解引用，所以最终返回的是 一个引用 */
+    return *((V *)v);
+    /*FIXME: V是泛型，这里将 void* 转为V类型的指针，再解引用，所以最终返回的是
+     * 一个引用 */
   }
   /**
-   * 返回JObject的类型
+   * 返回JObject的数据类型 type
    * @return
    */
   TYPE Type() { return m_type; }
@@ -165,20 +169,22 @@ public:
   string to_string();
   /**
    * 为list类型的数据定义一个push_back方法
+   * 将item这个JObject对象压入this->list最后。
    * @param item
    */
   void push_back(JObject item) {
-    if (m_type == T_LIST) {
+    if (T_LIST == m_type) {
+      /*这里先使用模板函数Value<T>()获取 this->JObject 对象中的list的值*/
       auto &list = Value<list_t>();
-      list.push_back(std::move(item));
+      list.push_back(std::move(item)); /*使用move，可以避免多余的拷贝*/
       return;
     }
-    /*如果调用这个函数的不是 list，那么抛出异常*/
+    /*如果调用这个函数的对象的数据类型不是 list，那么抛出异常*/
     throw std::logic_error("not a list type! JObjcct::push_back()");
   }
 
   void pop_back() {
-    if (m_type == T_LIST) {
+    if (T_LIST == m_type) {
       auto &list = Value<list_t>();
       list.pop_back();
       return;
@@ -187,7 +193,13 @@ public:
   }
   /**
    * 重载了 下标运算符，使得 dict的类型可以直接 dict[i] = xx;
-   * @param key
+   * 可以使得一个类的对象像数组一样访问它的成员，这可以增加代码的可读性和可维护性。
+   *
+   * @param key string const &key 是一个
+   常引用，它指向一个不可变的string对象，不能通过它修改对象的值1。 const string
+   &key 是一个 常对象，它本身是一个不可变的string对象，也不能修改它的值2。
+                    两者都可以作为函数参数传递，但是 常引用
+   可以避免拷贝开销，并且保证实参不被修改
    * @return
    */
   JObject &operator[](string const &key) {
@@ -201,8 +213,6 @@ public:
 private:
   // 根据类型获取值的地址，直接硬转为void*类型，然后外界调用Value函数进行类型的强转
   void *value();
-
-private:
   /* JObject需要两种数据，第一个就是 tag ： 标识了当前存的是什么样的数据，
    *                     第二个是 实际存储的数据*/
   TYPE m_type;     /* 枚举类型 */
@@ -217,11 +227,12 @@ private:
 /* FIXME:下面是写的方法 */
 void *JObject::value() {
   /*调用get_if得到对应的数据指针（std::variant 获取数据的一种方式）
-   * get得到的是对象的引用，如果获取不到，则抛出异常，get_if获取对象的指针，如果获取不到则返回nullptr
+   * get得到的是 对象的引用 ，如果获取不到，则抛出异常，get_if
+   *获取对象的指针，如果获取不到则返回 nullptr
    *FIXME: 使用get_if的原因是:
    *这个异常的处理可以由你自己来设定提示，而不是对着底层的get提示而摸不着头脑。*/
   switch (m_type) { /*根据类型获取值*/
-  case T_NULL:
+  case T_NULL: /*前期定义的时候，我们把json的null定义为 string 类型*/
     return get_if<str_t>(&m_value);
   case T_BOOL:
     return get_if<bool_t>(&m_value);
@@ -239,7 +250,7 @@ void *JObject::value() {
     return nullptr;
   }
 }
-/*用于简化指针强转过程的宏*/
+/*用于简化 指针强转为任意类型（前提：value得是 void* ） 过程的宏*/
 #define GET_VALUE(type) *((type *)value)
 /**
  * 序列化
