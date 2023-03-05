@@ -1,6 +1,5 @@
 /*用于测试反序列化与序列化*/
 /*Json类*/
-#include "../include/JObject.h"
 #include "../include/Parser.h"
 /*sys类*/
 #include <iostream>

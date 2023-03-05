@@ -1,6 +1,5 @@
 /*用于测试JSON字符串的解析*/
 /*Json类*/
-#include "../include/JObject.h"
 #include "../include/Parser.h"
 /*计时类*/
 #include "../BenchMark_Tool/Timer.cpp"
@@ -18,10 +17,11 @@ void test_string_parser() {
   }
   std::string text((std::istreambuf_iterator<char>(fin)),
                    std::istreambuf_iterator<char>());
+  /*接下来测试解析性能*/
   {
-    Timer t;
+    Timer t; /*RAII封装，出作用域打印耗时*/
     auto object = json::Parser::FromString(text);
-
+    /*试试有没有解析成功*/
     std::cout << ((object["[css]"]["editor.suggest.insertMode"]).ToString())
               << "\n";
   }
