@@ -9,7 +9,7 @@
 #include <string_view>
 namespace json {
 /*===== 用于定义序列化和反序列化函数的函数名 =====*/
-#define FUNC_TO_NAME _to_json /*序列化*/
+#define FUNC_TO_NAME _to_json     /*序列化*/
 #define FUNC_FROM_NAME _from_json /*反序列化*/
 
 /**---------------------------------
@@ -438,8 +438,8 @@ template <class T> string Parser::ToJSON(const T &src) {
    * （自定义类型肯定是 dict 类型）*/
   json::JObject obj((json::dict_t())); /*创建一个空dict*/
   /*需要你对该类型定义对应的方法，该方法需要将值传递给
-   * JObject，为了简化这个过程我们用宏来替代。 FUNC_TO_NAME是通过宏，自动生成
-   * 对应方法 的*/
+   * JObject，为了简化这个过程我们用宏来替代。
+   * FUNC_TO_NAME是通过宏，自动生成(🤣循环嵌套，这里有点令人费解) 对应方法 的*/
   src.FUNC_TO_NAME(obj);
   return obj.ToString();
 }
