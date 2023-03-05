@@ -86,4 +86,10 @@ string m_str;
 size_t m_idx{}; /*当前解析的字符的位置 0 */
 ```
 # 6. TODO:与其他开源项目的性能对比
-测试用的json文件，是我从vscode里面取出来的。
+测试用的json文件，是我从vscode里面取出来的[VScode配置文件](./test_json/vscode_Nocomment.json)。  
+
+| 库        | 用时  |
+|----------|-----|
+| MyJSON   |     |
+| rapidJSON |     |
+| simdJSON |     | 
