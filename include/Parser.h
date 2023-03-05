@@ -9,8 +9,8 @@
 #include <string_view>
 namespace json {
 /*===== 用于定义序列化和反序列化函数的函数名 =====*/
-#define FUNC_TO_NAME _to_json
-#define FUNC_FROM_NAME _from_json
+#define FUNC_TO_NAME _to_json /*序列化*/
+#define FUNC_FROM_NAME _from_json /*反序列化*/
 
 /**---------------------------------
  *|     @start:序列化函数宏定义      |
@@ -21,9 +21,10 @@ namespace json {
  * 对象中== */
 #define to(key) obj[key]
 /*将一个自定义类型的成员变量（比如结构体）添加到 JSON 对象中。
- * 首先，创建一个 json::JObject 对象 tmp，用来存储要添加到 JSON 对象中的自定义类型的成员变量。
- * 接着，调用自定义类型的成员变量的 _to_json 函数，将成员变量的值转换为 tmp 对象中的 JSON 对象。
- * 最后，将 tmp 对象作为一个整体，添加到要返回的 JSON 对象中。*/
+ * 首先，创建一个 json::JObject 对象 tmp，用来存储要添加到 JSON
+ * 对象中的自定义类型的成员变量。 接着，调用自定义类型的成员变量的 _to_json
+ * 函数，将成员变量的值转换为 tmp 对象中的 JSON 对象。 最后，将 tmp
+ * 对象作为一个整体，添加到要返回的 JSON 对象中。*/
 #define to_struct(key, struct_member)                                          \
   json::JObject tmp((json::dict_t()));                                         \
   struct_member.FUNC_TO_NAME(tmp);                                             \
@@ -60,7 +61,7 @@ using int_t = int32_t;
 using bool_t = bool;
 using double_t = double;
 using str_t = string;
-/*申明JObject类，因为在Parser中会用到*/
+/*声明JObject类，因为在Parser中会用到*/
 class JObject;
 
 /*
@@ -72,9 +73,9 @@ class Parser {
 public:
   Parser() = default;
   static JObject FromString(string_view content);
-  /**@funtional 对任意类型进行 序列化(C++ struct => json字符串) */
+  /** @funtional 对任意类型进行 序列化(C++ struct => json字符串) */
   template <class T> static string ToJSON(T const &src);
-  /**@funtional 对任意类型进行 反序列化(json字符串 => C++ struct ) */
+  /** @funtional 对任意类型进行 反序列化(json字符串 => C++ struct ) */
   template <class T> static T FromJson(string_view src);
   void init(string_view src);
   void trim_right();

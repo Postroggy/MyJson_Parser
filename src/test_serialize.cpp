@@ -7,11 +7,12 @@ using namespace json;
 struct Base {
   int pp;
   string qq;
+  /*序列化*/
   START_FROM_JSON
   pp = from("pp", int);
   qq = from("qq", string);
   END_FROM_JSON
-
+  /*反序列化*/
   START_TO_JSON
   to("pp") = pp;
   to("qq") = qq;

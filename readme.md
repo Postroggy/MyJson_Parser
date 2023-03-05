@@ -1,7 +1,7 @@
 # 1. 支持vscode类型注释的Json解析器
--[x] 采用递归下降解析json  
--[x] header-only的库  
--[x] 写着玩，性能上不要有什么期待  
+- [x] 采用递归下降解析json  
+- [x] header-only的库  
+- [x] 写着玩，性能上不要有什么期待  
 # 2. 解析图示
 ![示例.svg](images/exp.png)
 # 3. 用法
