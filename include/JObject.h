@@ -166,7 +166,7 @@ public:
    */
   TYPE Type() { return m_type; }
 
-  string to_string();
+  string ToString();
   /**
    * 为list类型的数据定义一个push_back方法
    * 将item这个JObject对象压入this->list最后。
@@ -257,7 +257,7 @@ void *JObject::value() {
  * 把JObject转化为string类型的数据，相当于把序列化的过程反推一遍
  * @return
  */
-std::string JObject::to_string() {
+std::string JObject::ToString() {
   void *value = this->value();
   std::ostringstream OutStream; /*定义输出流，向字符串写入数据*/
   switch (m_type) {
@@ -279,30 +279,30 @@ std::string JObject::to_string() {
   case T_STR:
     OutStream << '\"' << GET_VALUE(string) << '\"';
     break;
-  case T_LIST: { /*FIXME：如果是列表的话，只需要遍历他的每一个元素，递归调用
-            to_string()方法*/
+  case T_LIST: {
+    /* FIXME：如果是列表的话，只需要遍历他的每一个元素，递归调用ToString()方法*/
     list_t &list = GET_VALUE(list_t);
     OutStream << '['; /*注意在最开始的时候加上 左括号 `[` */
     for (auto i = 0; i < list.size(); i++) {
       /*遍历列表*/
       if (i != list.size() - 1) {
-        OutStream << ((list[i]).to_string());
+        OutStream << ((list[i]).ToString());
         OutStream << ','; /*注意，在中间还需要输出 ， 逗号*/
       } else
-        OutStream << ((list[i]).to_string()); /*如果是最后一个元素的话，不用输出
+        OutStream << ((list[i]).ToString()); /*如果是最后一个元素的话，不用输出
                                    逗号 了*/
     }
     OutStream << ']'; /*注意在最结束的时候加上 右括号 `[` */
     break;
   }
-  case T_DICT: { /*如果是字典，*/
+  case T_DICT: { /*如果是字典*/
     dict_t &dict = GET_VALUE(dict_t);
     OutStream << '{'; /*先输出 { */
     for (auto it = dict.begin(); it != dict.end(); ++it) {
       if (it != dict.begin()) /*为了保证最后的json格式正确，中间要输出逗号*/
         OutStream << ',';
       /* first是key，second是value。对于key，要使用" " 包裹，然后再输出冒号 : */
-      OutStream << '\"' << it->first << "\":" << it->second.to_string();
+      OutStream << '\"' << it->first << "\":" << it->second.ToString();
     }
     OutStream << '}'; /* 输出 } ，结束*/
     break;

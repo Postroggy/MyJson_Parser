@@ -61,7 +61,7 @@ void test_string_parser() {
     Timer t;
     auto object = json::Parser::FromString(text);
 
-    std::cout << ((object["[css]"]["editor.suggest.insertMode"]).to_string())
+    std::cout << ((object["[css]"]["editor.suggest.insertMode"]).ToString())
               << "\n";
   }
 }

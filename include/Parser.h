@@ -45,77 +45,26 @@ class JObject;
 class Parser {
 public:
   Parser() = default;
-
   static JObject FromString(string_view content);
-
-  template <class T>
   /**
-   * 实现对任意类型进行序列化，根据类型判断，再统一调用to_string方法
+   * 实现对任意类型进行 序列化，根据类型判断，再统一调用ToString方法
    * @tparam T
    * @param src
    * @return
    */
-  static string ToJSON(T const &src) {
-    /*如果是基本类型*/
-    if constexpr (IS_TYPE(T, int_t)) {
-      JObject object(src);
-      return object.to_string();
-    } else if constexpr (IS_TYPE(T, bool_t)) {
-      JObject object(src);
-      return object.to_string();
-    } else if constexpr (IS_TYPE(T, double_t)) {
-      JObject object(src);
-      return object.to_string();
-    } else if constexpr (IS_TYPE(T, str_t)) {
-      JObject object(src);
-      return object.to_string();
-    }
-    /*如果是自定义类型调用方法完成dict的赋值，然后to_string即可
-     * （自定义类型肯定是 dict 类型）*/
-    json::JObject obj((json::dict_t()));
-    /*需要你对该类型定义对应的方法，该方法需要将值传递给JObject，为了简化这个过程我们用宏来替代。
-     * FUNC_TO_NAME是通过宏，自动生成 对应方法 的*/
-    src.FUNC_TO_NAME(obj);
-    return obj.to_string();
-  }
-
-  template <class T> static T FromJson(string_view src) {
-    JObject object = FromString(src);
-    // 如果是基本类型
-    if constexpr (is_basic_type<T>()) {
-      return object.template Value<T>();
-    }
-
-    // 调用T类型对应的成岩函数
-    if (object.Type() != T_DICT)
-      throw std::logic_error("not dict type fromjson");
-    T ret;
-    ret.FUNC_FROM_NAME(object);
-    return ret;
-  }
-
+  template <class T> static string ToJSON(T const &src);
+  template <class T> static T FromJson(string_view src);
   void init(string_view src);
-
   void trim_right();
-
   void skip_comment();
-
   bool is_esc_consume(size_t pos);
-
   char get_next_token();
-
   JObject parse();
-
   JObject parse_null();
-
   JObject parse_number();
-
   bool parse_bool();
-
   string parse_string();
-
   JObject parse_list();
-
   JObject parse_dict();
 
 private:
@@ -432,6 +381,44 @@ JObject Parser::parse_dict() {
     /*继续循环*/
   }
   return dict;
+}
+template <class T> T Parser::FromJson(string_view src) {
+  JObject object = FromString(src);
+  // 如果是基本类型
+  if constexpr (is_basic_type<T>()) {
+    return object.template Value<T>();
+  }
+
+  // 调用T类型对应的成岩函数
+  if (object.Type() != T_DICT)
+    throw std::logic_error("not dict type fromjson");
+  T ret;
+  ret.FUNC_FROM_NAME(object);
+  return ret;
+}
+template <class T> string Parser::ToJSON(const T &src) {
+  /*如果是基本类型(非dict)*/
+  if constexpr (IS_TYPE(T, int_t)) {
+    JObject object(src);
+    return object.ToString();
+  } else if constexpr (IS_TYPE(T, bool_t)) {
+    JObject object(src);
+    return object.ToString();
+  } else if constexpr (IS_TYPE(T, double_t)) {
+    JObject object(src);
+    return object.ToString();
+  } else if constexpr (IS_TYPE(T, str_t)) {
+    JObject object(src);
+    return object.ToString();
+  }
+  /*如果是自定义类型调用方法完成dict的赋值，然后ToString即可
+   * （自定义类型肯定是 dict 类型）*/
+  json::JObject obj((json::dict_t())); /*创建一个空dict*/
+  /*需要你对该类型定义对应的方法，该方法需要将值传递给
+   * JObject，为了简化这个过程我们用宏来替代。 FUNC_TO_NAME是通过宏，自动生成
+   * 对应方法 的*/
+  src.FUNC_TO_NAME(obj);
+  return obj.ToString();
 }
 } // namespace json
 
