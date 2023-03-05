@@ -46,13 +46,9 @@ class Parser {
 public:
   Parser() = default;
   static JObject FromString(string_view content);
-  /**
-   * 实现对任意类型进行 序列化，根据类型判断，再统一调用ToString方法
-   * @tparam T
-   * @param src
-   * @return
-   */
+  /**@funtional 对任意类型进行 序列化(C++ struct => json字符串) */
   template <class T> static string ToJSON(T const &src);
+  /**@funtional 对任意类型进行 反序列化(json字符串 => C++ struct ) */
   template <class T> static T FromJson(string_view src);
   void init(string_view src);
   void trim_right();

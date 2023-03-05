@@ -46,7 +46,7 @@ using dict_t = std::unordered_map<string, JObject>;
  * 并在函数调用时返回一个bool值（是基本类型：true，不是false）。
  * 这里我们定义的基本类型是：string、bool、double、int。
  * 判断类型的操作主要是依靠 std::is_same
- * @functional 主要作用：方便后续根据对应的类型，执行对于的操作
+ * @functional 主要作用：方便后续根据对应的类型，执行对应的操作
  * @tparam T
  * @return bool
  */
@@ -66,7 +66,6 @@ class JObject {
 public:
   /* 这里的作用就是定义类型，为了代码简洁 */
   using value_t = variant<bool_t, int_t, double_t, str_t, list_t, dict_t>;
-
   JObject() /*键值 ，默认构造类型默认为null类型*/
   {
     m_type = T_NULL;

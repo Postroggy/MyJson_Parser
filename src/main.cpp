@@ -45,8 +45,8 @@ struct Mytest {
 void test_class_serialization() {
   Mytest test{.id = 32, .name = "fda"};
   auto item = Parser::FromJson<Mytest>(
-      R"({"base":{"pp":0,"qq":""},"id":32,"name":"fda"} )"); // serialization
-  std::cout << Parser::ToJSON(item);                         // deserialization
+      R"({"base":{"pp":0,"qq":""},"id":32,"name":"fda"} )"); // 反序列化
+  std::cout << Parser::ToJSON(item);                         // 序列化
 }
 
 void test_string_parser() {
