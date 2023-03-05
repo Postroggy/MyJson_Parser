@@ -8,22 +8,48 @@
 #include <string>
 #include <string_view>
 namespace json {
+/*===== 用于定义序列化和反序列化函数的函数名 =====*/
 #define FUNC_TO_NAME _to_json
 #define FUNC_FROM_NAME _from_json
 
+/**---------------------------------
+ *|     @start:序列化函数宏定义      |
+ * --------------------------------*/
+/*=====  序列化函数的起始标志 =====*/
 #define START_TO_JSON void FUNC_TO_NAME(json::JObject &obj) const {
+/*==将当前对象的成员变量序列化为 JSON 对象的键值对，并将其加入到 JObject
+ * 对象中== */
 #define to(key) obj[key]
-/*push一个自定义类型的成员*/
+/*将一个自定义类型的成员变量（比如结构体）添加到 JSON 对象中。
+ * 首先，创建一个 json::JObject 对象 tmp，用来存储要添加到 JSON 对象中的自定义类型的成员变量。
+ * 接着，调用自定义类型的成员变量的 _to_json 函数，将成员变量的值转换为 tmp 对象中的 JSON 对象。
+ * 最后，将 tmp 对象作为一个整体，添加到要返回的 JSON 对象中。*/
 #define to_struct(key, struct_member)                                          \
   json::JObject tmp((json::dict_t()));                                         \
   struct_member.FUNC_TO_NAME(tmp);                                             \
   obj[key] = tmp
+/*=====  序列化函数的结束标志 =====*/
 #define END_TO_JSON }
+/**---------------------------------
+ *|     @end:序列化函数宏定义      |
+ * --------------------------------*/
 
+/**---------------------------------
+ *|     @start:反序列化函数宏定义      |
+ * --------------------------------*/
 #define START_FROM_JSON void FUNC_FROM_NAME(json::JObject &obj) {
+/*从 JSON 对象中获取指定键名的值，并将其转换为指定类型的变量值。*/
 #define from(key, type) obj[key].Value<type>()
+/*从 JSON
+ * 对象中获取指定键名的值，并将其转换为自定义类型的变量值。该宏会调用结构体或类的
+ * _from_json 函数，将 json::JObject 转换为自定义类型的对象。*/
 #define from_struct(key, struct_member) struct_member.FUNC_FROM_NAME(obj[key])
+/*反序列化函数结束标志*/
 #define END_FROM_JSON }
+/**---------------------------------
+ *|     @end:反序列化函数宏定义      |
+ * --------------------------------*/
+
 /*方便使用 std*/
 using std::string;
 using std::string_view;
@@ -393,7 +419,7 @@ template <class T> T Parser::FromJson(string_view src) {
   return ret;
 }
 template <class T> string Parser::ToJSON(const T &src) {
-  /*如果是基本类型(非dict)*/
+  /*如果是基本类型(非dict)，先封装成JObject，才能调用其 ToString的方法*/
   if constexpr (IS_TYPE(T, int_t)) {
     JObject object(src);
     return object.ToString();
