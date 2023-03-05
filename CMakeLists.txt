@@ -6,3 +6,4 @@ include_directories(include)
 #[[测试文件]]
 add_executable(${PROJECT_NAME}_1 src/test_Json_Parser.cpp)
 add_executable(${PROJECT_NAME}_2 src/test_serialize.cpp)
+add_executable(${PROJECT_NAME}_benchmark src/test_parse_Speed.cpp)

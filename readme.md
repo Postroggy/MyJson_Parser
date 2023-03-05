@@ -48,8 +48,8 @@ struct Base
     string qq;
 
     void _from_json(json::JObject& obj){ //反序列化
-        pp = obj.Value<int>();
-        qq = obj.Value<string>();
+        pp = obj[pp].Value<int>();
+        qq = obj[qq].Value<string>();
     }
     
     void _to_json(json::JObject& obj){//序列化代码
